@@ -24,8 +24,8 @@
 <style id="lungta-wind-horse-animation">
 .horse-run{position:relative;width:100%;height:100%;display:grid;place-items:center;overflow:visible;isolation:isolate;--horse-speed:1.08s;--horse-drive:1}
 .horse-runner{position:relative;width:100%;height:100%;display:grid;place-items:center;transform-origin:58% 60%;animation:horseSurge 3.8s cubic-bezier(.37,0,.2,1) infinite;will-change:transform}
-.horse-runner>img{position:relative;mix-blend-mode:screen;z-index:3;width:100%;height:100%;object-fit:contain;animation:horseGallop var(--horse-speed) cubic-bezier(.45,.02,.31,1) infinite;transform-origin:61% 59%;will-change:transform,filter;filter:drop-shadow(0 0 10px rgba(255,255,255,.05))}
-.horse-ghost{position:absolute;mix-blend-mode:screen;inset:7% 5% 7% -8%;z-index:1;background:url('assets/img/wind-horse-mark.webp') center/contain no-repeat;opacity:.055;filter:blur(4px);transform:translateX(-3%);animation:horseWake 1.6s ease-out infinite;pointer-events:none}
+.horse-runner>img{position:relative;z-index:3;width:100%;height:100%;object-fit:contain;animation:horseGallop var(--horse-speed) cubic-bezier(.45,.02,.31,1) infinite;transform-origin:61% 59%;will-change:transform,filter,opacity;filter:drop-shadow(0 0 10px rgba(255,255,255,.05));opacity:0;transition:opacity .25s ease}.horse-run.is-keyed .horse-runner>img{opacity:1}.horse-run:not(.is-keyed) .horse-ghost{opacity:0!important}
+.horse-ghost{position:absolute;inset:7% 5% 7% -8%;z-index:1;background:url('assets/img/wind-horse-mark.webp') center/contain no-repeat;opacity:.055;filter:blur(4px);transform:translateX(-3%);animation:horseWake 1.6s ease-out infinite;pointer-events:none}
 .horse-ghost.two{inset:7% 5% 7% -13%;opacity:.03;filter:blur(9px);animation-delay:-.72s;animation-duration:2.05s}
 .horse-dust{position:absolute;z-index:2;left:7%;top:29%;width:52%;height:46%;pointer-events:none;opacity:.52;filter:blur(.25px);background:radial-gradient(circle at 76% 42%,rgba(255,255,255,.85) 0 1px,transparent 1.5px),radial-gradient(circle at 48% 58%,rgba(255,255,255,.58) 0 1px,transparent 1.7px),radial-gradient(circle at 27% 36%,rgba(255,255,255,.42) 0 1px,transparent 1.6px),radial-gradient(circle at 58% 22%,rgba(255,255,255,.35) 0 1px,transparent 1.4px),linear-gradient(90deg,transparent,rgba(255,255,255,.08) 72%,transparent);background-size:61px 43px,73px 57px,89px 62px,97px 71px,100% 100%;animation:horseParticles 1.05s linear infinite}
 .horse-visual:hover .horse-run{--horse-speed:.72s}
@@ -171,7 +171,7 @@
   </section>
 
   <section class="final-cta" data-header-theme="dark">
-    <p class="eyebrow" data-reveal">Drop 01</p>
+    <p class="eyebrow" data-reveal>Drop 01</p>
     <h2 class="display" data-reveal>Nothing still.</h2>
     <div class="cta-actions" data-reveal>
       <a class="button" href="shop.html">Enter the collection</a>
@@ -214,5 +214,48 @@
  const draw=now=>{const dt=Math.min(42,now-prev);prev=now;if(s.active){s.velocity*=Math.pow(.93,dt/16.67);s.phase+=dt*(s.hover?.00105:.00034);s.scale=lerp(s.scale,s.targetScale+s.velocity*.6,s.hover?.095:.045);s.x=lerp(s.x,s.tx,s.hover?.11:.045);s.y=lerp(s.y,s.ty,s.hover?.11:.045);s.rx=lerp(s.rx,s.trx,s.hover?.09:.04);s.ry=lerp(s.ry,s.try,s.hover?.09:.04);filterTick+=dt;if(filterTick>42){filterTick=0;const f1=.00425+Math.sin(s.phase*.56)*.0011+(s.hover?Math.abs(s.ry)*.00008:0),f2=.0105+Math.cos(s.phase*.41)*.0017+(s.hover?s.velocity*.00038:0);noise.setAttribute('baseFrequency',f1.toFixed(5)+' '+f2.toFixed(5));disp.setAttribute('scale',(s.scale+Math.sin(s.phase*.88)*.55).toFixed(2))}stage.style.setProperty('--wind-x',s.x.toFixed(2)+'px');stage.style.setProperty('--wind-y',(s.y+Math.sin(s.phase*.72)*3.2).toFixed(2)+'px');stage.style.setProperty('--wind-rx',s.rx.toFixed(2)+'deg');stage.style.setProperty('--wind-ry',s.ry.toFixed(2)+'deg');stage.style.setProperty('--wind-rz',(Math.sin(s.phase*.43)*(s.hover?.32:.16)).toFixed(2)+'deg');stage.style.setProperty('--wind-scale',(1+(s.hover?.009:.003)+Math.min(s.velocity*.0025,.008)).toFixed(4));stage.style.setProperty('--wind-halo',(s.hover?.42:.24).toFixed(2))}requestAnimationFrame(draw)};requestAnimationFrame(draw);
 })();
 </script>
+
+<script id="lungta-wind-horse-alpha">
+(()=>{
+ const root=document.querySelector('[data-horse-run]');
+ if(!root)return;
+ const run=root.querySelector('.horse-run');
+ const img=root.querySelector('.horse-runner>img');
+ const ghosts=[...root.querySelectorAll('.horse-ghost')];
+ if(!run||!img)return;
+ let done=false;
+ const keyBlack=()=>{
+   if(done||!img.naturalWidth)return;
+   done=true;
+   try{
+     const c=document.createElement('canvas');
+     c.width=img.naturalWidth;c.height=img.naturalHeight;
+     const x=c.getContext('2d',{willReadFrequently:true});
+     x.drawImage(img,0,0);
+     const frame=x.getImageData(0,0,c.width,c.height),d=frame.data;
+     for(let i=0;i<d.length;i+=4){
+       const r=d[i],g=d[i+1],b=d[i+2],m=Math.max(r,g,b);
+       if(m<=2){d[i]=d[i+1]=d[i+2]=d[i+3]=0;continue}
+       const a=m/255;
+       d[i]=Math.min(255,Math.round(r/a));
+       d[i+1]=Math.min(255,Math.round(g/a));
+       d[i+2]=Math.min(255,Math.round(b/a));
+       d[i+3]=m;
+     }
+     x.putImageData(frame,0,0);
+     const clean=c.toDataURL('image/webp',.98);
+     ghosts.forEach(g=>g.style.backgroundImage=`url("${clean}")`);
+     img.onload=()=>run.classList.add('is-keyed');
+     img.src=clean;
+     if(img.complete)run.classList.add('is-keyed');
+   }catch(e){
+     console.warn('Wind Horse matte removal fallback',e);
+     run.classList.add('is-keyed');
+   }
+ };
+ if(img.complete)keyBlack();else img.addEventListener('load',keyBlack,{once:true});
+})();
+</script>
+
 </body>
 </html>
