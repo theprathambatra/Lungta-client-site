@@ -8,6 +8,7 @@
   const style = document.createElement('style');
   style.id = 'lungta-global-brand-motion';
   style.textContent = `
+    .lungta-brand-object-media{background:transparent!important;overflow:visible!important}
     .lungta-matte-pending{opacity:0!important}
     .lungta-matte-ready{opacity:1;transition:opacity .22s ease}
     .lungta-cape-live{transform-origin:88% 49%;will-change:transform,filter;animation:lungtaCapeFlight 5.4s cubic-bezier(.37,0,.2,1) infinite;filter:url(#lungtaGlobalCapeWave) drop-shadow(0 18px 40px rgba(0,0,0,.20))}
@@ -59,9 +60,15 @@
   const displace=document.getElementById('lungtaCapeDisplace');
   let capeHover=0,phase=0,last=performance.now();
 
+  function exposeObjectCanvas(img){
+    const media=img.closest('.editorial-media');
+    if(media) media.classList.add('lungta-brand-object-media');
+  }
+
   function keyBlackMatte(img){
     const source=img.getAttribute('src')||'';
     if(!source||source.startsWith('data:')||img.dataset.lungtaKeyed==='1') return Promise.resolve();
+    exposeObjectCanvas(img);
     img.classList.add('lungta-matte-pending');
     if(cache.has(source)){
       img.src=cache.get(source);
@@ -103,6 +110,7 @@
 
   const capes=[...document.querySelectorAll('img[src*="wind-flow.webp"]')];
   capes.forEach(img=>{
+    exposeObjectCanvas(img);
     keyBlackMatte(img).then(()=>{
       if(!img.closest('[data-wind-flow]')){
         img.classList.add('lungta-cape-live');
@@ -114,6 +122,7 @@
 
   const horses=[...document.querySelectorAll('img[src*="wind-horse-mark.webp"]')];
   horses.forEach(img=>{
+    exposeObjectCanvas(img);
     if(img.closest('[data-horse-run]')) return;
     keyBlackMatte(img).then(()=>{
       if(img.closest('.lungta-horse-stage')) return;
