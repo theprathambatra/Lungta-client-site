@@ -115,5 +115,13 @@
   }
   $("#checkoutButton")?.addEventListener("click", () => LungtaStore.checkout());
   window.LungtaUI = { renderBag, showToast, closeAll };
+
+  if (!document.querySelector('script[data-lungta-brand-motion]')) {
+    const brandMotion = document.createElement("script");
+    brandMotion.src = "assets/js/brand-motion.js";
+    brandMotion.dataset.lungtaBrandMotion = "1";
+    document.body.appendChild(brandMotion);
+  }
+
   renderBag();
 })();
