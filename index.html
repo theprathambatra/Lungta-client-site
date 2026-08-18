@@ -9,6 +9,17 @@
   <link rel="icon" href="assets/img/favicon.png">
   <link rel="preload" as="image" href="assets/img/hero-wind-horse-4k.webp">
   <link rel="stylesheet" href="assets/css/styles.css">
+
+<style id="lungta-wind-flow-animation">
+.wind-interactive{isolation:isolate;perspective:1200px;overflow:hidden}
+.wind-filter-defs{position:absolute;pointer-events:none}
+.wind-stage{position:relative;width:min(100%,820px);aspect-ratio:1/1;display:grid;place-items:center;transform-style:preserve-3d;will-change:transform;transform:translate3d(var(--wind-x,0px),var(--wind-y,0px),0) rotateX(var(--wind-rx,0deg)) rotateY(var(--wind-ry,0deg)) rotateZ(var(--wind-rz,0deg)) scale(var(--wind-scale,1));transition:filter .45s cubic-bezier(.22,.61,.36,1)}
+.wind-object .wind-flow-img{width:100%;max-width:none;height:100%;object-fit:contain;display:block;filter:url(#lungtaWindRipple);transform:translateX(-3%) scale(1.75);transform-origin:50% 50%;pointer-events:none;user-select:none;will-change:filter,transform}
+.wind-halo{position:absolute;inset:23%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.075),rgba(255,255,255,0) 70%);filter:blur(42px);opacity:var(--wind-halo,.25);pointer-events:none}
+.wind-interactive.is-hovering .wind-stage{filter:drop-shadow(0 32px 70px rgba(0,0,0,.44))}
+@media(max-width:760px){.wind-stage{width:112%;margin-left:-6%}.wind-object .wind-flow-img{transform:translateX(-3%) scale(1.88)}}
+@media(prefers-reduced-motion:reduce){.wind-stage{transform:none!important}.wind-object .wind-flow-img{filter:none;transform:translateX(-3%) scale(1.75)}}
+</style>
 </head>
 <body class="home" data-header="light">
 <header class="site-header" data-theme="light">
@@ -46,8 +57,19 @@
 
   <section class="section element-section" data-header-theme="light">
     <div class="section-inner element-grid">
-      <div class="wind-object" data-reveal>
-        <img src="assets/img/wind-flow.webp" alt="LUNGTA wind and flow concept">
+      <div class="wind-object wind-interactive" data-reveal data-wind-flow>
+        <svg class="wind-filter-defs" width="0" height="0" aria-hidden="true">
+          <defs>
+            <filter id="lungtaWindRipple" x="-30%" y="-30%" width="160%" height="160%">
+              <feTurbulence id="lungtaWindNoise" type="fractalNoise" baseFrequency="0.0045 0.011" numOctaves="2" seed="7" result="noise"/>
+              <feDisplacementMap id="lungtaWindDisplace" in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+        </svg>
+        <div class="wind-stage">
+          <img class="wind-flow-img" src="assets/img/wind-flow.webp" alt="LUNGTA wind and flow concept">
+          <span class="wind-halo" aria-hidden="true"></span>
+        </div>
       </div>
       <div class="element-copy" data-reveal>
         <p class="eyebrow">Element 01 / Wind</p>
@@ -151,5 +173,20 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/js/config.js"></script><script src="assets/js/catalog.js"></script><script src="assets/js/shopify.js"></script><script src="assets/js/site.js"></script>
+
+<script id="lungta-wind-flow-script">
+(()=>{
+ const root=document.querySelector('[data-wind-flow]'); if(!root||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const stage=root.querySelector('.wind-stage'),noise=document.querySelector('#lungtaWindNoise'),disp=document.querySelector('#lungtaWindDisplace'); if(!stage||!noise||!disp)return;
+ const s={hover:false,active:true,x:0,y:0,tx:0,ty:0,rx:0,ry:0,trx:0,try:0,velocity:0,lastX:0,lastY:0,lastT:performance.now(),phase:0,scale:2.5,targetScale:2.5};
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,k)=>a+(b-a)*k;
+ new IntersectionObserver(([e])=>s.active=e.isIntersecting,{rootMargin:'20% 0px 20%'}).observe(root);
+ root.addEventListener('pointerenter',e=>{if(e.pointerType==='touch')return;s.hover=true;s.targetScale=5.5;s.lastX=e.clientX;s.lastY=e.clientY;s.lastT=performance.now();root.classList.add('is-hovering')});
+ root.addEventListener('pointermove',e=>{if(!s.hover||e.pointerType==='touch')return;const r=root.getBoundingClientRect(),nx=clamp((e.clientX-r.left)/r.width*2-1,-1,1),ny=clamp((e.clientY-r.top)/r.height*2-1,-1,1);s.tx=nx*11;s.ty=ny*7;s.try=nx*2.8;s.trx=-ny*2;const now=performance.now(),dt=Math.max(16,now-s.lastT),v=Math.hypot(e.clientX-s.lastX,e.clientY-s.lastY)/dt;s.velocity=Math.max(s.velocity,clamp(v*3.2,0,3));s.lastX=e.clientX;s.lastY=e.clientY;s.lastT=now});
+ root.addEventListener('pointerleave',()=>{s.hover=false;s.targetScale=2.5;s.tx=s.ty=s.trx=s.try=0;root.classList.remove('is-hovering')});
+ let prev=performance.now(),filterTick=0;
+ const draw=now=>{const dt=Math.min(42,now-prev);prev=now;if(s.active){s.velocity*=Math.pow(.93,dt/16.67);s.phase+=dt*(s.hover?.00105:.00034);s.scale=lerp(s.scale,s.targetScale+s.velocity*.6,s.hover?.095:.045);s.x=lerp(s.x,s.tx,s.hover?.11:.045);s.y=lerp(s.y,s.ty,s.hover?.11:.045);s.rx=lerp(s.rx,s.trx,s.hover?.09:.04);s.ry=lerp(s.ry,s.try,s.hover?.09:.04);filterTick+=dt;if(filterTick>42){filterTick=0;const f1=.00425+Math.sin(s.phase*.56)*.0011+(s.hover?Math.abs(s.ry)*.00008:0),f2=.0105+Math.cos(s.phase*.41)*.0017+(s.hover?s.velocity*.00038:0);noise.setAttribute('baseFrequency',f1.toFixed(5)+' '+f2.toFixed(5));disp.setAttribute('scale',(s.scale+Math.sin(s.phase*.88)*.55).toFixed(2))}stage.style.setProperty('--wind-x',s.x.toFixed(2)+'px');stage.style.setProperty('--wind-y',(s.y+Math.sin(s.phase*.72)*3.2).toFixed(2)+'px');stage.style.setProperty('--wind-rx',s.rx.toFixed(2)+'deg');stage.style.setProperty('--wind-ry',s.ry.toFixed(2)+'deg');stage.style.setProperty('--wind-rz',(Math.sin(s.phase*.43)*(s.hover?.32:.16)).toFixed(2)+'deg');stage.style.setProperty('--wind-scale',(1+(s.hover?.009:.003)+Math.min(s.velocity*.0025,.008)).toFixed(4));stage.style.setProperty('--wind-halo',(s.hover?.42:.24).toFixed(2))}requestAnimationFrame(draw)};requestAnimationFrame(draw);
+})();
+</script>
 </body>
 </html>
