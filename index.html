@@ -22,22 +22,41 @@
 </style>
 
 <style id="lungta-wind-horse-animation">
-.horse-run{position:relative;width:100%;height:100%;display:grid;place-items:center;overflow:visible;isolation:isolate;--horse-speed:1.08s;--horse-drive:1}
-.horse-runner{position:relative;width:100%;height:100%;display:grid;place-items:center;transform-origin:58% 60%;animation:horseSurge 3.8s cubic-bezier(.37,0,.2,1) infinite;will-change:transform}
-.horse-runner>img{position:relative;z-index:3;width:100%;height:100%;object-fit:contain;animation:horseGallop var(--horse-speed) cubic-bezier(.45,.02,.31,1) infinite;transform-origin:61% 59%;will-change:transform,filter,opacity;filter:drop-shadow(0 0 10px rgba(255,255,255,.05));opacity:0;transition:opacity .25s ease}.horse-run.is-keyed .horse-runner>img{opacity:1}.horse-run:not(.is-keyed) .horse-ghost{opacity:0!important}
-.horse-ghost{position:absolute;inset:7% 5% 7% -8%;z-index:1;background:url('assets/img/wind-horse-mark.webp') center/contain no-repeat;opacity:.055;filter:blur(4px);transform:translateX(-3%);animation:horseWake 1.6s ease-out infinite;pointer-events:none}
-.horse-ghost.two{inset:7% 5% 7% -13%;opacity:.03;filter:blur(9px);animation-delay:-.72s;animation-duration:2.05s}
-.horse-dust{position:absolute;z-index:2;left:7%;top:29%;width:52%;height:46%;pointer-events:none;opacity:.52;filter:blur(.25px);background:radial-gradient(circle at 76% 42%,rgba(255,255,255,.85) 0 1px,transparent 1.5px),radial-gradient(circle at 48% 58%,rgba(255,255,255,.58) 0 1px,transparent 1.7px),radial-gradient(circle at 27% 36%,rgba(255,255,255,.42) 0 1px,transparent 1.6px),radial-gradient(circle at 58% 22%,rgba(255,255,255,.35) 0 1px,transparent 1.4px),linear-gradient(90deg,transparent,rgba(255,255,255,.08) 72%,transparent);background-size:61px 43px,73px 57px,89px 62px,97px 71px,100% 100%;animation:horseParticles 1.05s linear infinite}
-.horse-visual:hover .horse-run{--horse-speed:.72s}
-.horse-visual:hover .horse-runner{animation-duration:2.45s;transform:translateX(10px) scale(1.012)}
-.horse-visual:hover .horse-runner>img{filter:drop-shadow(0 0 18px rgba(255,255,255,.10))}
-.horse-visual:hover .horse-dust{opacity:.78;animation-duration:.68s}
-@keyframes horseGallop{0%,100%{transform:translate3d(-1px,1px,0) rotate(-.25deg) scaleX(1) scaleY(1)}18%{transform:translate3d(5px,-7px,0) rotate(.5deg) scaleX(1.012) scaleY(.993)}38%{transform:translate3d(10px,-2px,0) rotate(.1deg) scaleX(1.022) scaleY(.985)}56%{transform:translate3d(3px,6px,0) rotate(-.55deg) scaleX(.994) scaleY(1.009)}74%{transform:translate3d(-3px,-5px,0) rotate(.35deg) scaleX(1.01) scaleY(.994)}}
-@keyframes horseSurge{0%,100%{transform:translateX(-1.4%) scale(1)}48%{transform:translateX(1.1%) scale(1.006)}60%{transform:translateX(1.5%) scale(1.008)}}
-@keyframes horseWake{0%{opacity:0;transform:translateX(3%) scale(1.002)}22%{opacity:.055}100%{opacity:0;transform:translateX(-9%) scale(.985)}}
-@keyframes horseParticles{from{background-position:0 0,0 0,0 0,0 0,0 0}to{background-position:-61px 0,-73px 0,-89px 0,-97px 0,-120px 0}}
-@media(max-width:760px){.horse-run{--horse-speed:1.18s}.horse-ghost{opacity:.04}.horse-dust{opacity:.34}}
-@media(prefers-reduced-motion:reduce){.horse-runner,.horse-runner>img,.horse-ghost,.horse-dust{animation:none!important}.horse-visual:hover .horse-runner{transform:none}}
+.horse-run{position:relative;width:100%;height:100%;display:grid;place-items:center;overflow:visible;isolation:isolate;--horse-speed:.88s;--horse-trail:1.28s}
+.horse-runner{position:relative;width:100%;height:100%;display:grid;place-items:center;transform-origin:61% 61%;will-change:transform}
+.horse-runner>img{position:relative;z-index:3;width:100%;height:100%;object-fit:contain;animation:horseStrideRun var(--horse-speed) linear infinite;transform-origin:61% 60%;will-change:transform,filter,opacity;filter:drop-shadow(0 0 10px rgba(255,255,255,.05));opacity:0;transition:opacity .25s ease,filter .35s ease}.horse-run.is-keyed .horse-runner>img{opacity:1}.horse-run:not(.is-keyed) .horse-ghost{opacity:0!important}
+.horse-ghost{position:absolute;inset:7% 5% 7% -8%;z-index:1;background:url('assets/img/wind-horse-mark.webp') center/contain no-repeat;opacity:.05;filter:blur(4px);transform-origin:62% 60%;animation:horseTrailRun var(--horse-trail) cubic-bezier(.2,.7,.22,1) infinite;pointer-events:none}
+.horse-ghost.two{inset:7% 5% 7% -12%;opacity:.027;filter:blur(8px);animation-delay:calc(var(--horse-trail)*-.46)}
+.horse-dust{position:absolute;z-index:2;left:7%;top:29%;width:52%;height:46%;pointer-events:none;opacity:.48;filter:blur(.25px);background:radial-gradient(circle at 76% 42%,rgba(255,255,255,.82) 0 1px,transparent 1.5px),radial-gradient(circle at 48% 58%,rgba(255,255,255,.54) 0 1px,transparent 1.7px),radial-gradient(circle at 27% 36%,rgba(255,255,255,.40) 0 1px,transparent 1.6px),radial-gradient(circle at 58% 22%,rgba(255,255,255,.33) 0 1px,transparent 1.4px),linear-gradient(90deg,transparent,rgba(255,255,255,.08) 72%,transparent);background-size:61px 43px,73px 57px,89px 62px,97px 71px,100% 100%;animation:horseDustRun var(--horse-speed) linear infinite}
+.horse-visual:hover .horse-run{--horse-speed:.60s;--horse-trail:.84s}
+.horse-visual:hover .horse-runner{transform:translateX(11px);transition:transform .45s cubic-bezier(.22,.61,.36,1)}
+.horse-visual:hover .horse-runner>img{filter:drop-shadow(0 0 17px rgba(255,255,255,.10))}
+.horse-visual:hover .horse-dust{opacity:.70}
+@keyframes horseStrideRun{
+  0%,100%{transform:translate3d(-5px,2px,0) scaleX(.996) scaleY(1.004)}
+  8%{transform:translate3d(-2px,3px,0) scaleX(.992) scaleY(1.007)}
+  20%{transform:translate3d(5px,-3px,0) scaleX(1.005) scaleY(.997)}
+  34%{transform:translate3d(12px,-9px,0) scaleX(1.015) scaleY(.990)}
+  47%{transform:translate3d(16px,-6px,0) scaleX(1.011) scaleY(.993)}
+  60%{transform:translate3d(10px,0,0) scaleX(1) scaleY(1.002)}
+  69%{transform:translate3d(6px,4px,0) scaleX(.993) scaleY(1.008)}
+  80%{transform:translate3d(1px,-2px,0) scaleX(1.004) scaleY(.998)}
+  91%{transform:translate3d(-3px,-1px,0) scaleX(1) scaleY(1)}
+}
+@keyframes horseTrailRun{
+  0%{opacity:0;transform:translate3d(2%,1px,0) scaleX(1)}
+  18%{opacity:.05}
+  55%{opacity:.035}
+  100%{opacity:0;transform:translate3d(-11%,3px,0) scaleX(.975)}
+}
+@keyframes horseDustRun{
+  0%{background-position:0 0,0 0,0 0,0 0,0 0;transform:translateX(1%);opacity:.28}
+  25%{opacity:.54}
+  55%{opacity:.42}
+  100%{background-position:-61px 0,-73px 0,-89px 0,-97px 0,-140px 0;transform:translateX(-6%);opacity:.26}
+}
+@media(max-width:760px){.horse-run{--horse-speed:.98s;--horse-trail:1.42s}.horse-ghost{opacity:.04}.horse-dust{opacity:.32}}
+@media(prefers-reduced-motion:reduce){.horse-runner>img,.horse-ghost,.horse-dust{animation:none!important}.horse-visual:hover .horse-runner{transform:none}}
 </style>
 </head>
 <body class="home" data-header="light">
